@@ -9,6 +9,8 @@
   "author": "Saul, Andrew, and Evan",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.16.4"
+    "express": "^4.16.4",
+    "sqlite": "^3.0.0",
+    "sqlite3": "latest"
   }
 }
