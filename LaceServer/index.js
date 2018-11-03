@@ -2,12 +2,21 @@ const db = require("./LaceDatabase");
 
 const express = require('express');
 const app = express();
-
+var bodyParser = require('body-parser')
 app.use(express.static('public'));
 
+app.use(bodyParser.urlencoded({
+    extended: true
+}));
+app.use(bodyParser.json());
 app.get('/', (req, res) => {
     res.sendFile('index.html');
 });
+
+app.post('/vote', (req, res) => {
+    db.vote(req.body.vote.solecial,req.body.vote.candidate)
+});
+
 
 db.initDatabase(false).then(()=>{
    db.register(1234,1234);
