@@ -128,3 +128,22 @@ exports.initDatabase = function(createDB = false) {
         });
     });
 };
+
+exports.getWinner = function () {
+    let sql = "SELECT CandidateName FROM ballots GROUP BY CandidateName ORDER BY COUNT(*) DESC LIMIT 1";
+    return new Promise((resolve, reject)=>{
+        db.all(sql, [], (err, rows) => {
+            if (err) reject(err);
+
+            let winner = '';
+            rows.forEach((row) => {
+                db.all(sql, [], (err, rows) => {
+                    if (err) reject(err);
+                    winner = rows[0].CandidateName;
+                    resolve(rows[0].CandidateName)
+                });
+            });
+            resolve(rows[0].CandidateName)
+        });
+    });
+}

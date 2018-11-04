@@ -17,6 +17,10 @@ app.post('/', (req, res) => {
     console.log("got vote" + JSON.stringify(req.body))
     db.vote(req.body.solecial,req.body.candidate)
     res.sendFile(__dirname +'/public/index.html');
+    db.getWinner().then((winner)=>{
+        console.log("the current winner is: " + winner)
+    })
+
 });
 
 
