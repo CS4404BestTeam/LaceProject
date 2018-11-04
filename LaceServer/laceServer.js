@@ -13,10 +13,13 @@ app.get('/', (req, res) => {
     res.sendFile('index.html');
 });
 
-app.post('/vote', (req, res) => {
-    console.log(req.body)
-    db.vote(req.body.vote.solecial,req.body.vote.candidate)
+app.post('/', (req, res) => {
+    db.vote(req.body.solecial,req.body.candidate)
     res.sendFile(__dirname +'/public/index.html');
+    db.getWinner().then((winner)=>{
+        console.log("the current winner is: " + winner)
+    })
+
 });
 
 
