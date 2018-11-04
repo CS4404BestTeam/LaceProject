@@ -14,6 +14,7 @@ app.get('/', (req, res) => {
 });
 
 app.post('/vote', (req, res) => {
+    console.log(req.body)
     db.vote(req.body.vote.solecial,req.body.vote.candidate)
     res.sendFile(__dirname +'/public/index.html');
 });
