@@ -14,7 +14,6 @@ app.get('/', (req, res) => {
 });
 
 app.post('/', (req, res) => {
-    console.log("got vote" + JSON.stringify(req.body))
     db.vote(req.body.solecial,req.body.candidate)
     res.sendFile(__dirname +'/public/index.html');
     db.getWinner().then((winner)=>{
@@ -25,7 +24,6 @@ app.post('/', (req, res) => {
 
 
 db.initDatabase(false).then(()=>{
-   db.register(1234,1234);
    db.getRegisteredVoters().then((voters)=>{
        voters.forEach((vote)=>{
            console.log(db.Voter.toVoter(vote))
