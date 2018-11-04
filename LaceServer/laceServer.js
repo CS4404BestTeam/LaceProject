@@ -20,7 +20,6 @@ app.post('/vote', (req, res) => {
 
 
 db.initDatabase(false).then(()=>{
-   db.register(1234,1234);
    db.getRegisteredVoters().then((voters)=>{
        voters.forEach((vote)=>{
            console.log(db.Voter.toVoter(vote))
