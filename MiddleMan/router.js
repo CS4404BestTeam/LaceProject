@@ -2,7 +2,6 @@
 const express = require('express');
 const app = express();
 var querystring = require('querystring');
-var reqLib = require('request')
 var bodyParser = require('body-parser')
 var http = require("http");
 app.use(bodyParser.urlencoded({
