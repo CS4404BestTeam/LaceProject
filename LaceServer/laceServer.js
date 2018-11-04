@@ -24,11 +24,13 @@ app.post('/', (req, res) => {
 
 
 db.initDatabase(false).then(()=>{
-   db.getRegisteredVoters().then((voters)=>{
-       voters.forEach((vote)=>{
-           console.log(db.Voter.toVoter(vote))
-       })
-   })
+    db.wipeBallots().then(
+        db.getRegisteredVoters().then((voters)=>{
+            voters.forEach((vote)=>{
+                console.log(db.Voter.toVoter(vote))
+            })
+    }))
+
 });
 
 app.listen(3000, () => console.log('Lace open on port 3000!'));

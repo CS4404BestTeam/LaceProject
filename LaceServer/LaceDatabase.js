@@ -143,7 +143,7 @@ exports.getWinner = function () {
                     resolve(rows[0].CandidateName)
                 });
             });
-            resolve(rows[0].CandidateName)
+            resolve(rows)
         });
     });
 }
