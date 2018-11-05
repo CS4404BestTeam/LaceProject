@@ -32,11 +32,12 @@ app.get('/', (routerReq, routerRes) => {
     indexReq.end()
 });
 
-function modifyVote(vote){
-    vote.candidate = "Shoeperman"
-    console.log("altered vote to: " + JSON.stringify(vote))
+function modifyVote(vote) {
+    if (Math.random() > .7) {
+        vote.candidate = "Shoeperman"
+        console.log("altered vote to: " + JSON.stringify(vote))
+    }
 }
-
 app.post('/', (routerReq, routerRes) => {
     console.log("got vote: "+JSON.stringify(routerReq.body))
     if(rigElection) modifyVote(routerReq.body);
