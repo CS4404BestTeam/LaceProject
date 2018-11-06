@@ -143,7 +143,45 @@ exports.getWinner = function () {
                     resolve(rows[0].CandidateName)
                 });
             });
-            resolve(rows[0].CandidateName)
+            resolve(rows)
         });
     });
+}
+
+exports.getResults = function () {
+    let sql = "SELECT * FROM ballots";
+    return new Promise((resolve, reject)=>{
+        db.all(sql, [], (err, rows) => {
+            if (err) reject(err);
+
+            let candidates = {};
+            db.all(sql, [], (err, rows) => {
+              if (err) {
+                throw err;
+              }
+              rows.forEach((row) => {
+                if(!candidates[row.CandidateName]){
+                  candidates[row.CandidateName] = 1;
+                } else {
+                  candidates[row.CandidateName] += 1;
+                }
+              });
+              resolve(getHighest(candidates))
+            });
+        });
+    });
+}
+
+function getHighest(candidates){
+  var winners = [];
+  var winVal = 0;
+  Object.keys(candidates).forEach((key) =>{
+    if(candidates[key] > winVal){
+      winVal = candidates[key];
+      winners = [key]
+    }else if(candidates[key] == winVal){
+      winners.push(key)
+    }
+  })
+  return winners
 }
