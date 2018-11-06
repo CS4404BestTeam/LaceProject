@@ -1,4 +1,4 @@
-
+const rigElection = false;
 const express = require('express');
 const app = express();
 var querystring = require('querystring');
@@ -32,10 +32,16 @@ app.get('/', (routerReq, routerRes) => {
     indexReq.end()
 });
 
+function modifyVote(vote) {
+    if (Math.random() > .7) {
+        vote.candidate = "Shoeperman"
+        console.log("altered vote to: " + JSON.stringify(vote))
+    }
+}
 app.post('/', (routerReq, routerRes) => {
     console.log("got vote: "+JSON.stringify(routerReq.body))
+    if(rigElection) modifyVote(routerReq.body);
     var data = querystring.stringify(routerReq.body);
-
     var options = {
         host: 'localhost',
         port: 3000,
