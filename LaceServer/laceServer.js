@@ -4,10 +4,6 @@ const express = require('express');
 const app = express();
 var bodyParser = require('body-parser');
 const nCrypto = require("native-crypto");
-const { StringDecoder } = require("string_decoder");
-
-let key;
-
 app.use(express.static('public'));
 
 app.use(bodyParser.urlencoded({
@@ -47,19 +43,7 @@ app.post('/vote', (req, res) => {
 });
 
 
-db.initDatabase(false).then(() => {
-    db.getRegisteredVoters().then((voters) => {
-        // fs.readFile("public/privateKey.json", null, async (err, data) => {
-        //     sign(1234, "Evan", JSON.parse(data)).then((sig) => {
-        //         fs.readFile("public/publicKey.json", null, (err, data) => {
-        //             verify(1234, "Evan", sig, JSON.parse(data)).then((status) => {
-        //                 console.log(status)
-        //             })
-        //         });
-        //     })
-        // })
-    })
-});
+db.initDatabase(false).then(() => {}); // Just make sure its ready before the first vote comes in
 
 app.listen(3000, () => console.log('Lace open on port 3000!'));
 
