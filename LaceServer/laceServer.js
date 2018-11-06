@@ -10,6 +10,7 @@ app.use(bodyParser.urlencoded({
     extended: true
 }));
 app.use(bodyParser.json());
+
 app.get('/', (req, res) => {
     res.sendFile('index.html');
 });
@@ -24,15 +25,18 @@ app.get('/key', (req, res) => {
     res.sendFile(__dirname + '/public/privateKey.json');
 });
 
-app.post('/vote', (req, res) => {
-    let signature = JSON.parse(req.body.vote.signature);
+app.post('/', (req, res) => {
+    let signature = JSON.parse(req.body.signature);
     let sigBuffer = Buffer.from(signature.data);
     console.log(sigBuffer);
     fs.readFile("public/publicKey.json", null, (err, data) => {
-        verify(req.body.vote.solecial, req.body.vote.candidate, sigBuffer, JSON.parse(data)).then((status) => {
+        verify(req.body.solecial, req.body.candidate, sigBuffer, JSON.parse(data)).then((status) => {
             if (status) {
-                db.vote(req.body.vote.solecial, req.body.vote.candidate);
+                db.vote(req.body.solecial, req.body.candidate);
                 res.sendFile(__dirname + '/public/index.html');
+                db.getWinner().then((winner) => {
+                    console.log("the current winner is: " + winner)
+                })
             }
             else {
                 res.send("SIGNATURE CHECK ERROR!")
@@ -43,7 +47,8 @@ app.post('/vote', (req, res) => {
 });
 
 
-db.initDatabase(false).then(() => {}); // Just make sure its ready before the first vote comes in
+db.initDatabase(false).then(() => {
+}); // Just make sure its ready before the first vote comes in
 
 app.listen(3000, () => console.log('Lace open on port 3000!'));
 
@@ -60,4 +65,5 @@ async function sign(solecialID, candidate, key) {
     signer.update(data);
     return await signer.sign();
 }
+
 
