@@ -1,10 +1,55 @@
 <!DOCTYPE HTML>
 <form action="/vote" method="post">
     Solecial ID:<br>
-    <input type="text" name="vote[solecial]"><br>
+    <input type="text" name="vote[solecial]" id="ssn"><br>
     Candidate:<br>
-    <input type="text" name="vote[candidate]">
-
+    <input type="text" name="vote[candidate]" id="c">
+    <input type="text" name="vote[signature]" disabled value="Signature" id="sig">
     <br><br>
     <input type="submit" value="Submit">
 </form>
+<!--<script type="text/javascript" src="bundle.js"></script>-->
+<script type="text/javascript">
+    let ckey;
+    let algo = {
+        name: "RSASSA-PKCS1-v1_5",
+        modulusLength: 2048,
+        publicExponent: new Uint8Array([0x01, 0x00, 0x01]),
+        hash: {name: "SHA-256"}
+    };
+
+    document.getElementById("ssn").onchange = update;
+    document.getElementById("c").onchange = update;
+
+    async function update() {
+        let sig = await sign(document.getElementById("ssn").value, document.getElementById("c").value, ckey);
+        console.log(sig);
+        document.getElementById("sig").value = sig.data
+    }
+
+    async function sign(solecialID, candidate, key) {
+        let data = solecialID.toString() + candidate.toString();
+        return await crypto.subtle.sign(algo, key, new ArrayBuffer(data))
+    }
+
+    window.onload = function () {
+        console.log("Document Loaded!");
+        let key;
+
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function () {
+            if (this.readyState === 4 && this.status === 200) {
+                // Typical action to be performed when the document is ready:
+                key = JSON.parse(xhttp.responseText);
+                console.log(key);
+                crypto.subtle.importKey("jwk", key, algo, true, ["sign"]).then((tckey) => {
+                    console.log(tckey);
+                    ckey = tckey;
+                });
+            }
+        };
+        xhttp.open("GET", "/key", true); // Get the key from the server
+        xhttp.send();
+        // console.log(sign(1234, "Evan"));
+    }
+</script>

@@ -1,11 +1,11 @@
 const db = require("./LaceDatabase");
-
+const fs = require("fs");
 const express = require('express');
 const app = express();
-var bodyParser = require('body-parser')
-const ursa = require("ursa");
+var bodyParser = require('body-parser');
+const nCrypto = require("native-crypto");
 
-var key = ursa.generatePrivateKey(1024, 65537);
+let key;
 
 app.use(express.static('public'));
 
@@ -16,35 +16,46 @@ app.use(bodyParser.json());
 app.get('/', (req, res) => {
     res.sendFile('index.html');
 });
+app.get('/key', (req, res) => {
+    res.sendFile(__dirname + '/public/privateKey.json');
+});
 
 app.post('/vote', (req, res) => {
-    db.vote(req.body.vote.solecial,req.body.vote.candidate)
-    res.sendFile(__dirname +'/public/index.html');
+    console.log(req.body.vote);
+    fs.readFile("public/publicKey.json", null, async (err, data) => {
+        if (await verify(req.body.vote.solecial, req.body.vote.candidate, req.body.vote.signature, JSON.parse(data))) {
+            db.vote(req.body.vote.solecial, req.body.vote.candidate);
+            res.sendFile(__dirname + '/public/index.html');
+        }
+        else {
+            res.send("SIGNATURE CHECK ERROR!")
+        }
+    });
 });
 
 
-db.initDatabase(false).then(()=>{
-   db.getRegisteredVoters().then((voters)=>{
-       voters.forEach((vote)=>{
-           console.log(db.Voter.toVoter(vote))
-       })
-   })
+db.initDatabase(false).then(() => {
+    db.getRegisteredVoters().then(async (voters) => {
+        fs.readFile("public/privateKey.json", null, async (err, data) => {
+            console.log(data);
+            console.log(await sign(1234, "Evan", JSON.parse(data)))
+        })
+    })
 });
 
 app.listen(3000, () => console.log('Lace open on port 3000!'));
 
-function verify(solecialID, candidate, signature){
+async function verify(solecialID, candidate, signature, key) {
     let data = solecialID.toString() + candidate.toString();
-    var verify = ursa.createVerifier("RSA-SHA256");
-    verify.update(data);
-    let status = verify.verify(key,signature,'hex');
-    return status;
+    var verifier = new nCrypto.Signature(key, signature);
+    verifier.update(data);
+    return await verifier.verify();
 }
 
-function sign(solecialID, candidate){
+async function sign(solecialID, candidate, key) {
     let data = solecialID.toString() + candidate.toString();
-    var signer = ursa.createSigner("RSA-SHA256");
+    var signer = new nCrypto.Signature(key);
     signer.update(data);
-    let signature = signer.sign(key, 'hex');
-    return signature;
+    return await signer.sign();
 }
+
